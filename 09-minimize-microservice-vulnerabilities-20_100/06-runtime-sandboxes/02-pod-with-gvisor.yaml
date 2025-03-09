@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sandbox-pod
+spec:
+  runtimeClassName: gvisor
+  containers:
+    - name: busybox
+      image: busybox
+      command:
+        - sh
+        - -c
+        - "echo Running; sleep 3600"

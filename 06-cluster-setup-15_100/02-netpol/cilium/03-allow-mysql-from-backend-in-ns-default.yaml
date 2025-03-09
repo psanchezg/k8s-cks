@@ -1,0 +1,31 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-mysql-from-backend-in-ns-default
+  namespace: db
+spec:
+  # Applies to all pods in database namespace
+  endpointSelector: {}
+  # Allow incoming traffic only from backend pods in web namespace
+  ingress:
+  - fromEndpoints:
+    - matchLabels: {}
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: default
+        run: backend
+    toPorts:
+      - ports:
+        - port: "80"
+          protocol: TCP
+  # Allow outgoing DNS traffic only to kube-dns
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+      - ports:
+        - port: "53"
+          protocol: UDP
+        - port: "53"
+          protocol: TCP

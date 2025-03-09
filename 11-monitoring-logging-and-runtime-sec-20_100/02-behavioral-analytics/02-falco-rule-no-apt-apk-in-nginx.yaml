@@ -1,0 +1,11 @@
+- rule: Nginx Pod Initiates Unwanted Package Management Processes
+  desc: Detect a Pod that initiates unwanted package management processes
+  condition: >
+    (proc.name in (apt, apt-get, yum, apk, dnf) or
+    proc.name startswith "dpkg" or
+    proc.name startswith "apt" or
+    proc.name startswith "rpm")
+  output: >
+    A Pod running nginx container initiated an unwanted package management process (command:  ${proc.cmdline})
+  priority: WARNING
+  tags: [k8s, container, nginx, security]

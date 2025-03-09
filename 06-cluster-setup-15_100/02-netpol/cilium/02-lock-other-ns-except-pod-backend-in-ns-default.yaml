@@ -1,0 +1,31 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: lockdown-database
+  namespace: db
+spec:
+  # Empty selector matches all pods in the namespace
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    # Allow all Pods in same namespace and backend Pod in web namespace
+    - matchLabels: {}
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: default
+        run: backend
+        # No egress field means allow all outgoing traffic from namespace
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-database
+  namespace: default
+spec:
+  # Empty selector matches all pods in the namespace
+  endpointSelector: {}
+  egress:
+  - toEndpoints:
+    # Allow all Pods in same namespace and backend Pod in web namespace
+    - matchLabels: {}
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: db

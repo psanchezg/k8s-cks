@@ -1,0 +1,10 @@
+- rule: shell_in_container
+  desc: notice shell activity within a container
+  condition: >
+    evt.type = execve and
+    evt.dir = < and
+    container.id = 7a5ea6a080d1
+  output: >
+    shell in a container
+    %evt.time,%container.id,%user.name,%proc.name
+  priority: WARNING

@@ -1,0 +1,23 @@
+apiVersion: audit.k8s.io/v1
+kind: Policy
+# Lists request stages to be omitted from logging, such as
+omitStages:
+  - "RequestReceived"
+rules:
+  # Defines the logging level
+  - level: None,RequestResponse,Request,Metadata
+    # Specifies users affected by the rule
+    users: ["system:kube-proxy"]
+    # Lists user groups
+    userGroups: ["system:authenticated"]
+    verbs: ["watch"]
+    # Defines the API resources to which the rule applies
+    resources:
+    - group: ""
+      resources: ["pods/log", "pods/status"]
+      # Filters by specific resource names
+      resourceNames: ["controller-leader"]
+    # Limits the rule to specific namespaces
+    namespaces: ["kube-system"]
+  # A catch-all rule to log all other requests at the Metadata level.
+  - level: Metadata

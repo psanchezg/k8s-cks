@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: secure
+  namespace: web
+spec:
+  tls:
+    - hosts: # add
+      - secure-ingress.test # add
+      secretName: tls-secret # add
+  rules:
+    - host: secure-ingress.test
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: testsvc
+                port:
+                  number: 80

@@ -1,0 +1,14 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: lockdown-web
+  namespace: web
+spec:
+  # Empty selector matches all pods in the namespace
+  endpointSelector: {}
+  # Match all labels in same namespace
+  ingress:
+  - fromEndpoints:
+    - matchLabels: {}
+
+  # No egress field means allow all outgoing traffic from namespace

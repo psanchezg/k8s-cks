@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: another-namespace
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: staging-deployment
+  namespace: another-namespace
+  labels:
+    app: web
+    env: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      env: staging
+  template:
+    metadata:
+      labels:
+        env: staging
+    spec:
+      containers:
+      - name: web
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myservice
+  namespace: default
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otherservice
+  namespace: another-namespace
+  labels:
+    env: staging
+spec:
+  selector:
+    env: staging
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: testsvc
+  namespace: web
+  labels:
+    role: web
+spec:
+  selector:
+    role: web
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 32001

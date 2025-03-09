@@ -1,0 +1,30 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: image-pull-policy-webhook
+webhooks:
+  - name: image-pull-policy.k8s.io
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      url: "https://webhook-service.default.svc:443"
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ3VENDQVVlZ0F3SUJBZ0lRTDJuU25wSUpFakVvUk05d0lvRUZ5akFLQmdncWhrak9QUVFEQXpBaU1TQXcKSGdZRFZRUURFeGRqWlhKMExXMWhibUZuWlhJdGQyVmlhRzl2YXkxallUQWVGdzB5TlRBeU1qY3hPRFV3TXpGYQpGdzB5TmpBeU1qY3hPRFV3TXpGYU1DSXhJREFlQmdOVkJBTVRGMk5sY25RdGJXRnVZV2RsY2kxM1pXSm9iMjlyCkxXTmhNSFl3RUFZSEtvWkl6ajBDQVFZRks0RUVBQ0lEWWdBRUFDcCtiZTBrUDB3Nno4RnpRWXRrODBVamxkMi8KRU5SLzBiL1lGUitGZFo5U0NRYmwxMmhCMmRCTTdRTDg0Vkp4Z1J2T1lIZEZ6eDF6d0p6bnYvN0lzUndSUXJHcworYWlmbUFMaWdZa3dyeERUZDBvY2kzMVl5WjQ2bmtMc25wM0tvMEl3UURBT0JnTlZIUThCQWY4RUJBTUNBcVF3CkR3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVVljV05IN2ZYcFZta0prRWpRT1Q3Nkd4Sk53VXcKQ2dZSUtvWkl6ajBFQXdNRGFBQXdaUUl3Q3cvSUpTVmxaTmVtd3ZiVTBaOG5uaHFRZFBocUNyRFBDVFdJVU5adApxdk11RW1WTHBoU001ZUgrZ2s2eTdUZzVBakVBM3RyeTF1ZTB6QzVjekZwOEl5SjYwZlBzNDZaVHRLb016T0E0CnpXNWpiZFlBVEtLb0RHZ2V2bTg5VVRqTy9pKzIKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    rules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+    failurePolicy: Fail
+    sideEffects: None
+    timeoutSeconds: 5
+---
+apiVersion: apiserver.config.k8s.io/v1
+kind: AdmissionConfiguration
+plugins:
+  - name: ImagePolicyWebhook
+    configuration:
+      imagePolicy:
+        kubeConfigFile: /root/.kube/config
+        allowTTL: 50
+        denyTTL: 50
+        retryBackoff: 500
+        defaultAllow: true # Allow if the backend is not available
